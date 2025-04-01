@@ -1,5 +1,5 @@
 module dff #(
-    parameter DATA_WIDTH = 36
+    parameter DATA_WIDTH = 33
 ) (
     input clk,
     input rst_n,

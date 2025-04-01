@@ -1,16 +1,16 @@
 module filter #(
-    parameter DATA_WIDTH = 19
+    parameter DATA_WIDTH = 16
 ) 
 (
     input                               clk,
     input                               rst_n,
     input   signed [DATA_WIDTH-1:0]     FilterIn,
     input                               ValidIn,
-    output reg signed [35:0]     data_out,
+    output reg signed [32:0]           data_out,
     output reg                         ValidOut
 );
 
-localparam signed [16:0] h1     =   17'b00000001010110111;
+localparam signed [16:0] h1     =   17'b00000001010110111; 
 localparam signed [16:0] h2     =   17'b00000000011111101;
 localparam signed [16:0] h3     =   17'b11111101100110010;
 localparam signed [16:0] h4     =   17'b11111010111110110;
@@ -29,99 +29,91 @@ localparam signed [16:0] h16    =   17'b00000000011111101;
 localparam signed [16:0] h17    =   17'b00000001010110111;
 
 
-reg signed [18:0] data_in_0;
+reg signed [15:0] data_in_0;
 
-wire signed [18:0] data_in_delay_0;
-wire signed [35:0] data_in_delay_1;
-wire signed [35:0] data_in_delay_2;
-wire signed [35:0] data_in_delay_3;
-wire signed [35:0] data_in_delay_4;
-wire signed [35:0] data_in_delay_5;
-wire signed [35:0] data_in_delay_6;
-wire signed [35:0] data_in_delay_7;
-wire signed [35:0] data_in_delay_8;
-wire signed [35:0] data_in_delay_9;
-wire signed [35:0] data_in_delay_10;
-wire signed [35:0] data_in_delay_11;
-wire signed [35:0] data_in_delay_12;
-wire signed [35:0] data_in_delay_13;
-wire signed [35:0] data_in_delay_14;
-wire signed [35:0] data_in_delay_15;
-wire signed [35:0] data_in_delay_16;
+wire signed [15:0] data_in_delay_0_0;
 
 
-wire signed [35:0] mul1;
-wire signed [35:0] mul2;
-wire signed [35:0] mul3;
-wire signed [35:0] mul4;
-wire signed [35:0] mul5;
-wire signed [35:0] mul6;    
-wire signed [35:0] mul7;
-wire signed [35:0] mul8;
-wire signed [35:0] mul9;
-wire signed [35:0] mul10;
-wire signed [35:0] mul11;
-wire signed [35:0] mul12;
-wire signed [35:0] mul13;
-wire signed [35:0] mul14;
-wire signed [35:0] mul15;
-wire signed [35:0] mul16;
-wire signed [35:0] mul17;
+wire signed [32:0] data_in_delay_1;
+wire signed [32:0] data_in_delay_2;
+wire signed [32:0] data_in_delay_3;
+wire signed [32:0] data_in_delay_4;
+wire signed [32:0] data_in_delay_5;
+wire signed [32:0] data_in_delay_6;
+wire signed [32:0] data_in_delay_7;
+wire signed [32:0] data_in_delay_8;
+wire signed [32:0] data_in_delay_9;
+wire signed [32:0] data_in_delay_10;
+wire signed [32:0] data_in_delay_11;
+wire signed [32:0] data_in_delay_12;
+wire signed [32:0] data_in_delay_13;
+wire signed [32:0] data_in_delay_14;
+wire signed [32:0] data_in_delay_15;
+wire signed [32:0] data_in_delay_16;
 
 
-wire signed [35:0] add1;
-wire signed [35:0] add2;
-wire signed [35:0] add3;
-wire signed [35:0] add4;
-wire signed [35:0] add5;
-wire signed [35:0] add6;
-wire signed [35:0] add7;
-wire signed [35:0] add8;
-wire signed [35:0] add9;
-wire signed [35:0] add10;
-wire signed [35:0] add11;
-wire signed [35:0] add12;
-wire signed [35:0] add13;
-wire signed [35:0] add14;
-wire signed [35:0] add15;
-wire signed [35:0] add16;
+wire signed [32:0] mul1;
+wire signed [32:0] mul2;
+wire signed [32:0] mul3;    
+wire signed [32:0] mul4;
+wire signed [32:0] mul5;
+wire signed [32:0] mul6;    
+wire signed [32:0] mul7;
+wire signed [32:0] mul8;
+wire signed [32:0] mul9;
+wire signed [32:0] mul10;
+wire signed [32:0] mul11;
+wire signed [32:0] mul12;
+wire signed [32:0] mul13;
+wire signed [32:0] mul14;
+wire signed [32:0] mul15;
+wire signed [32:0] mul16;
+wire signed [32:0] mul17;
 
-reg [4:0] num_taps;
+
+wire signed [32:0] add1;
+wire signed [32:0] add2;
+wire signed [32:0] add3;
+wire signed [32:0] add4;
+wire signed [32:0] add5;
+wire signed [32:0] add6;
+wire signed [32:0] add7;
+wire signed [32:0] add8;
+wire signed [32:0] add9;
+wire signed [32:0] add10;
+wire signed [32:0] add11;
+wire signed [32:0] add12;
+wire signed [32:0] add13;
+wire signed [32:0] add14;
+wire signed [32:0] add15;
+wire signed [32:0] add16;
+
+reg [4:0] num_taps_and_delay;
+
 
 
 always @(negedge clk or negedge rst_n) begin
     if (!rst_n) begin
         data_in_0 <= 0;
-    end else if (ValidIn == 1) begin
+    end else if (ValidIn) begin
         data_in_0 <= FilterIn;
     end else begin
         data_in_0 <= 0;
     end
 end
 
-reg [3:0] count;
-
-always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-        count <= 0;
-    end else if (count == 2) begin
-        count <= 2;
-    end else begin
-        count <= count + 1;
-    end
-end
-
 
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         ValidOut <= 0;
         data_out <= 0;
-    end else if (count == 2 && ValidIn == 1) begin
+        num_taps_and_delay <= 0;
+    end else if (ValidIn) begin
         ValidOut <= 1;
         data_out <= add16;
-        num_taps <= 5'd17;
-    end else if (num_taps > 0) begin
-        num_taps <= num_taps - 1;
+        num_taps_and_delay <= 5'd17;
+    end else if (num_taps_and_delay > 1) begin
+        num_taps_and_delay <= num_taps_and_delay - 1;
         ValidOut <= 1;
         data_out <= add16;
     end else begin
@@ -131,7 +123,8 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 
-dff #(19) dff_input (.clk(clk), .rst_n(rst_n), .d(data_in_0), .q(data_in_delay_0));
+// dff #(19) dff_input_1 (.clk(clk), .rst_n(rst_n), .d(data_in_0), .q(data_in_delay_0_0));
+
 
 dff dff_0 (.clk(clk), .rst_n(rst_n), .d(mul1), .q(data_in_delay_1));
 
@@ -167,23 +160,23 @@ dff dff_15 (.clk(clk), .rst_n(rst_n), .d(add15), .q(data_in_delay_16));
 
 
 
-assign mul1     = data_in_delay_0 * h17; 
-assign mul2     = data_in_delay_0 * h16;
-assign mul3     = data_in_delay_0 * h15;
-assign mul4     = data_in_delay_0 * h14;
-assign mul5     = data_in_delay_0 * h13;
-assign mul6     = data_in_delay_0 * h12; 
-assign mul7     = data_in_delay_0 * h11;
-assign mul8     = data_in_delay_0 * h10;
-assign mul9     = data_in_delay_0 * h9;
-assign mul10    = data_in_delay_0 * h8;
-assign mul11    = data_in_delay_0 * h7; 
-assign mul12    = data_in_delay_0 * h6;
-assign mul13    = data_in_delay_0 * h5;
-assign mul14    = data_in_delay_0 * h4;
-assign mul15    = data_in_delay_0 * h3;
-assign mul16    = data_in_delay_0 * h2;
-assign mul17    = data_in_delay_0 * h1;
+assign mul1     = data_in_0 * h17; 
+assign mul2     = data_in_0 * h16;
+assign mul3     = data_in_0 * h15;
+assign mul4     = data_in_0 * h14;
+assign mul5     = data_in_0 * h13;
+assign mul6     = data_in_0 * h12; 
+assign mul7     = data_in_0 * h11;
+assign mul8     = data_in_0 * h10;
+assign mul9     = data_in_0 * h9;
+assign mul10    = data_in_0 * h8;
+assign mul11    = data_in_0 * h7; 
+assign mul12    = data_in_0 * h6;
+assign mul13    = data_in_0 * h5;
+assign mul14    = data_in_0 * h4;
+assign mul15    = data_in_0 * h3;
+assign mul16    = data_in_0 * h2;
+assign mul17    = data_in_0 * h1;
 
 
 assign add1 = data_in_delay_1 + mul2;
